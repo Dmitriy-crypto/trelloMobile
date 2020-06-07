@@ -1,20 +1,23 @@
 package com.trello.qa.manager;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class ApplicationManager {
-
+    AppiumDriver appiumDriver;
     //-------------------Variables-------------------------------------
     public static String url = "https://trello.com/";
     public static String email = "dmitriy.stadnikov@yahoo.com";
     public static String password = "75Dmitriy.2013Eva";
     public String x = "23";
     public int numberBoards = 3;// number of boards to creat
-    WebDriver driver;
+
     BoardHelper boardHelper;
     TeamHelper teamHelper;
     SessionHelper sessionHelper;
@@ -24,24 +27,42 @@ public class ApplicationManager {
     int n; //board selection by position in "public void selectPersonalBoardByNumber"
 
 
-    public void init() throws InterruptedException {
+    public void init() throws InterruptedException, MalformedURLException {
 
-        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-        driver.manage().window().maximize();
-        //driver.manage().window().fullscreen();
+        DesiredCapabilities capabilities = new DesiredCapabilities();
 
-        teamHelper = new TeamHelper(driver);
-        boardHelper = new BoardHelper(driver);
-        sessionHelper = new SessionHelper(driver);
+        capabilities.setCapability("platformName","Android");
+        capabilities.setCapability("platformVersion", "6.0.1");
+        capabilities.setCapability("deviceName", "Moto G");
+        capabilities.setCapability("appPackage","com.trello");
+        capabilities.setCapability("appActivity", "home.HomeActivity");
+        capabilities.setCapability("automationName","Appium");
+        capabilities.setCapability("app",
+                "C:/Users/User/IdeaProjects/trelloMobile/src/test/resources/Trello_com.trello.apk");
 
-        sessionHelper.openSite(url);
+       /* capabilities.setCapability("app",
+                "src/test/resources/Trello_com.trello.apk");*/
+
+
+        appiumDriver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"),capabilities);
+
+
+
+
+
+
+
+        teamHelper = new TeamHelper(appiumDriver);
+        boardHelper = new BoardHelper(appiumDriver);
+        sessionHelper = new SessionHelper(appiumDriver);
+
+
         sessionHelper.loginToTrello(email, password);
     }
 
     public void stop() {
 
-        driver.quit();
+        appiumDriver.quit();
     }
 
     public BoardHelper getBoardHelper() {
